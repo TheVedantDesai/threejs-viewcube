@@ -20,6 +20,22 @@ npm install threejs-viewcube
 
 Or copy the `src` folder directly into your project.
 
+## Examples
+
+Check out the [examples folder](https://github.com/TheVedantDesai/threejs-viewcube/tree/main/examples) for complete implementations:
+
+- [Basic Three.js Integration](https://github.com/TheVedantDesai/threejs-viewcube/blob/main/examples/threejs-basic.html)
+- [Potree Integration](https://github.com/TheVedantDesai/threejs-viewcube/blob/main/examples/potree-integration.html)
+
+To run examples locally:
+
+```bash
+git clone https://github.com/TheVedantDesai/threejs-viewcube.git
+cd threejs-viewcube
+npm install
+npm run example
+```
+
 ## Quick Start
 
 ```javascript
