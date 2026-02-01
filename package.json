@@ -1,5 +1,5 @@
 {
-  "name": "threejs-viewcube",
+  "name": "threejs-navigationcube",
   "version": "1.0.0",
   "description": "A customizable ViewCube component for Three.js and Potree projects",
   "main": "src/index.js",

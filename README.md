@@ -1,4 +1,4 @@
-# threejs-viewcube
+# threejs-navigationcube
 
 A customizable ViewCube component for Three.js and Potree projects. Provides an intuitive 3D orientation indicator that syncs with your camera and allows users to quickly navigate to standard views.
 
@@ -15,7 +15,7 @@ A customizable ViewCube component for Three.js and Potree projects. Provides an 
 ## Installation
 
 ```bash
-npm install threejs-viewcube
+npm install threejs-navigationcube
 ```
 
 Or copy the `src` folder directly into your project.
@@ -40,7 +40,7 @@ npm run example
 
 ```javascript
 import * as THREE from 'three';
-import { ViewCube, FACES } from 'threejs-viewcube';
+import { ViewCube, FACES } from 'threejs-navigationcube';
 
 // Create your Three.js scene and camera
 const scene = new THREE.Scene();
@@ -159,7 +159,7 @@ new ViewCube({
 ### Face IDs
 
 ```javascript
-import { FACES } from 'threejs-viewcube';
+import { FACES } from 'threejs-navigationcube';
 
 FACES.TOP    // 1
 FACES.FRONT  // 2
@@ -173,7 +173,7 @@ FACES.BOTTOM // 6
 ## Potree Integration
 
 ```javascript
-import { ViewCube } from 'threejs-viewcube';
+import { ViewCube } from 'threejs-navigationcube';
 
 // Create ViewCube for Potree (Z-up coordinate system)
 const viewCube = new ViewCube({
@@ -212,7 +212,7 @@ viewer.addEventListener('update', () => {
 For advanced use cases, you can use the `ViewCubeMesh` class directly:
 
 ```javascript
-import { ViewCubeMesh } from 'threejs-viewcube';
+import { ViewCubeMesh } from 'threejs-navigationcube';
 
 const cube = new ViewCubeMesh({
   size: 30,
