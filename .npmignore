@@ -1,0 +1,8 @@
+# Source files are allowlisted in package.json, but good to be explicit
+.git
+.gitignore
+.npmignore
+node_modules
+examples
+*.log
+.DS_Store

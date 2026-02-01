@@ -1,0 +1,40 @@
+{
+  "name": "threejs-viewcube",
+  "version": "1.0.0",
+  "description": "A customizable ViewCube component for Three.js and Potree projects",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "types"
+  ],
+  "scripts": {
+    "example": "npx serve ."
+  },
+  "keywords": [
+    "threejs",
+    "three.js",
+    "viewcube",
+    "potree",
+    "3d",
+    "navigation",
+    "camera"
+  ],
+  "author": "Vedant Desai",
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "peerDependencies": {
+    "three": ">=0.120.0"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheVedantDesai/threejs-viewcube"
+  }
+}

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViewCube - Potree Integration Example</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; }
+    #potree_render_area { 
+      width: 100vw; 
+      height: 100vh; 
+      position: relative;
+      background: #1a1a2e;
+    }
+    .code-example {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.9);
+      color: #4ade80;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-width: 500px;
+      z-index: 100;
+    }
+    .code-example h3 {
+      color: white;
+      margin-bottom: 10px;
+    }
+    .code-example pre {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .comment { color: #6b7280; }
+    .keyword { color: #c084fc; }
+    .string { color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div id="potree_render_area"></div>
+  
+  <div class="code-example">
+    <h3>Potree Integration</h3>
+    <pre><span class="comment">// Create ViewCube for Potree (Z-up)</span>
+<span class="keyword">const</span> viewCube = <span class="keyword">new</span> ViewCube({
+  container: document.getElementById(<span class="string">'potree_render_area'</span>),
+  coordinateSystem: <span class="string">'Z-up'</span>,
+  size: 120
+});
+
+<span class="comment">// Handle face clicks</span>
+viewCube.on(<span class="string">'faceClick'</span>, (faceId, config) => {
+  <span class="keyword">const</span> view = viewer.scene.view;
+  view.position.set(config.position.x, ...);
+  view.lookAt(<span class="keyword">new</span> THREE.Vector3(0, 0, 0));
+});
+
+<span class="comment">// Update in animation loop</span>
+viewer.addEventListener(<span class="string">'update'</span>, () => {
+  viewCube.update(viewer.scene.getActiveCamera());
+});</pre>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { ViewCube, FACES } from '../src/index.js';
+
+    // This example simulates a Potree-like Z-up environment
+    const container = document.getElementById('potree_render_area');
+    
+    // Setup scene with Z-up orientation
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a2e);
+    
+    // Camera (Z-up perspective)
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.up.set(0, 0, 1); // Z-up
+    camera.position.set(5, 5, 5);
+    camera.lookAt(0, 0, 0);
+    
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    
+    // Orbit controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 10);
+    scene.add(light);
+    
+    // Create a point cloud-like visualization
+    const pointsGeometry = new THREE.BufferGeometry();
+    const pointsCount = 5000;
+    const positions = new Float32Array(pointsCount * 3);
+    const colors = new Float32Array(pointsCount * 3);
+    
+    for (let i = 0; i < pointsCount; i++) {
+      const i3 = i * 3;
+      positions[i3] = (Math.random() - 0.5) * 6;
+      positions[i3 + 1] = (Math.random() - 0.5) * 6;
+      positions[i3 + 2] = Math.random() * 3;
+      
+      // Color gradient based on height (Z)
+      const h = positions[i3 + 2] / 3;
+      colors[i3] = h;
+      colors[i3 + 1] = 0.5;
+      colors[i3 + 2] = 1 - h;
+    }
+    
+    pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const pointsMaterial = new THREE.PointsMaterial({
+      size: 0.05,
+      vertexColors: true
+    });
+    
+    const points = new THREE.Points(pointsGeometry, pointsMaterial);
+    scene.add(points);
+    
+    // Grid on XY plane (Z-up)
+    const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
+    gridHelper.rotation.x = Math.PI / 2; // Rotate to XY plane
+    scene.add(gridHelper);
+    
+    // Axes helper
+    const axesHelper = new THREE.AxesHelper(3);
+    scene.add(axesHelper);
+    
+    // Create ViewCube for Z-up coordinate system
+    const viewCube = new ViewCube({
+      container: container,
+      coordinateSystem: 'Z-up',
+      size: 120,
+      position: 'top-right',
+      cameraDistance: 10,
+      colors: {
+        main: 0xe0e0e0,
+        hover: 0x87CEEB,
+        outline: 0x555555
+      }
+    });
+    
+    // Handle face clicks
+    viewCube.on('faceClick', (faceId, config) => {
+      console.log('Potree navigation to:', faceId, config);
+      
+      const startPos = camera.position.clone();
+      const startUp = camera.up.clone();
+      const targetPos = new THREE.Vector3(config.position.x, config.position.y, config.position.z);
+      const targetUp = new THREE.Vector3(config.up.x, config.up.y, config.up.z);
+      
+      const duration = 500;
+      const startTime = performance.now();
+      
+      function animateCamera() {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = progress < 0.5 
+          ? 4 * progress * progress * progress 
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        camera.position.lerpVectors(startPos, targetPos, eased);
+        camera.up.lerpVectors(startUp, targetUp, eased).normalize();
+        camera.lookAt(0, 0, 0);
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateCamera);
+        }
+      }
+      
+      animateCamera();
+    });
+    
+    // Handle drag rotation - use world-axis rotation to avoid pole singularity
+    viewCube.on('drag', (deltaX, deltaY) => {
+      const rotationSpeed = 0.005;
+      const target = new THREE.Vector3(0, 0, 0);
+      
+      // Get the offset from target
+      const offset = camera.position.clone().sub(target);
+      const distance = offset.length();
+      
+      // Get view direction (from camera to target)
+      const viewDir = offset.clone().normalize().negate();
+      
+      // Calculate right vector from cross product of view direction and world up (Z-up)
+      const worldUp = new THREE.Vector3(0, 0, 1);
+      let right = new THREE.Vector3().crossVectors(viewDir, worldUp);
+      
+      // Handle pole case: when looking straight up or down, right vector is zero
+      if (right.lengthSq() < 0.001) {
+        // Use fallback right direction
+        right.set(1, 0, 0);
+      } else {
+        right.normalize();
+      }
+      
+      // Rotate around world Z-axis for horizontal movement (Z-up system)
+      const rotZ = new THREE.Quaternion().setFromAxisAngle(worldUp, -deltaX * rotationSpeed);
+      offset.applyQuaternion(rotZ);
+      
+      // Rotate around the right axis for vertical movement
+      const rotX = new THREE.Quaternion().setFromAxisAngle(right, -deltaY * rotationSpeed);
+      offset.applyQuaternion(rotX);
+      
+      // Apply new position, maintaining distance
+      offset.normalize().multiplyScalar(distance);
+      camera.position.copy(target).add(offset);
+      camera.lookAt(target);
+      controls.update();
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      viewCube.update(camera);
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
